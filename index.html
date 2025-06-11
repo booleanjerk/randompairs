@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Random Name Pair Generator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: linear-gradient(135deg, #ff007f, #ffea00);
+      color: #330036;
+    }
+
+    #input-section {
+      padding: 20px;
+      background: #fff0f6;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-size: 18px;
+      padding: 12px;
+      border: 3px dashed #ff007f;
+      border-radius: 12px;
+      background: #fff0f6;
+      color: #99004c;
+      resize: vertical;
+      font-weight: 700;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      margin: 10px 10px 0 0;
+      border: none;
+      border-radius: 12px;
+      background: #ff007f;
+      color: #ffea00;
+      transition: transform 0.25s, background 0.25s;
+      box-shadow: 0 0 8px #ff007faa;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background: #e60073;
+      box-shadow: 0 0 15px #ff00aa;
+    }
+
+    #card-container {
+      flex: 1;
+      display: grid;
+      gap: 20px;
+      padding: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      overflow-y: auto;
+      perspective: 1000px; /* for 3D flip */
+      background: transparent;
+    }
+
+    .card {
+      background: linear-gradient(135deg, #ffea00, #ff9d00);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(255, 0, 127, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      color: #330036;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      cursor: default;
+      user-select: none;
+
+      /* Start without rotation */
+      transition: transform 0.6s;
+    }
+
+    .card.flipping {
+      transform: rotateY(180deg);
+    }
+
+    #shuffle-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 0 15px #ff007fcc;
+    }
+  </style>
+</head>
+<body>
+  <div id="input-section">
+    <textarea id="nameInput" placeholder="Paste names here, one per line or comma separated..."></textarea>
+    <br />
+    <button onclick="generatePairs()">Generate Pairs</button>
+  </div>
+
+  <button id="shuffle-button" onclick="shufflePairs()">Shuffle Again</button>
+
+  <div id="card-container"></div>
+
+  <script>
+    let names = [];
+    let cards = [];
+
+    function generatePairs() {
+      names = document.getElementById("nameInput").value
+        .split(/[\n,]+/)   // Split by newlines or commas
+        .map(n => n.trim())
+        .filter(n => n.length > 0);
+
+      if (names.length < 2) {
+        alert("Please enter at least 2 names.");
+        return;
+      }
+      document.getElementById("input-section").style.display = "none";
+      document.getElementById("shuffle-button").style.display = "inline-block";
+      shufflePairs();
+    }
+
+    function shufflePairs() {
+      const shuffled = [...names];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      const pairs = [];
+      for (let i = 0; i < shuffled.length; i += 2) {
+        if (i + 1 < shuffled.length) {
+          pairs.push([shuffled[i], shuffled[i + 1]]);
+        } else {
+          pairs.push([shuffled[i], "(no partner)"]);
+        }
+      }
+
+      const container = document.getElementById("card-container");
+
+      // If cards already exist, flip animation for shuffle:
+      if (cards.length === pairs.length) {
+        // Animate flip on each card, then update text after half flip
+        cards.forEach((card, idx) => {
+          card.classList.add('flipping');
+          setTimeout(() => {
+            card.innerHTML = `<strong>${pairs[idx][0]}</strong><br>&<br><strong>${pairs[idx][1]}</strong>`;
+          }, 300);
+          setTimeout(() => {
+            card.classList.remove('flipping');
+          }, 600);
+        });
+      } else {
+        // First time rendering cards
+        container.innerHTML = "";
+        cards = pairs.map(pair => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `<strong>${pair[0]}</strong><br>&<br><strong>${pair[1]}</strong>`;
+          container.appendChild(card);
+          return card;
+        });
+      }
+    }
+  </script>
+</body>
+</html>
