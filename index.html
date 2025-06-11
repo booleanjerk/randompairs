@@ -157,7 +157,7 @@
         cards.forEach((card, idx) => {
           card.classList.add('flipping');
           setTimeout(() => {
-            card.innerHTML = `<strong>${pairs[idx][0]}</strong><br>&<br><strong>${pairs[idx][1]}</strong>`;
+            card.innerHTML = `<strong>${pairs[idx][0]}</strong><br><p></p><strong>${pairs[idx][1]}</strong>`;
           }, 300);
           setTimeout(() => {
             card.classList.remove('flipping');
@@ -169,7 +169,7 @@
         cards = pairs.map(pair => {
           const card = document.createElement("div");
           card.className = "card";
-          card.innerHTML = `<strong>${pair[0]}</strong><br>&<br><strong>${pair[1]}</strong>`;
+          card.innerHTML = `<strong>${pair[0]}</strong><br><br><strong>${pair[1]}</strong>`;
           container.appendChild(card);
           return card;
         });
